@@ -72,15 +72,40 @@ void parseArguments(int argc, char*argv[], SETTINGS * settings) {
 //validacia vstupnych argumentov programu
 void validateArguments(SETTINGS * settings) {
 	//doplnte valiciu, ktora overi, ci je vstupny argument symbolicka linka
+    struct stat info;
+
+    if (lstat(settings->symbolicLink, &info) == -1) {
+        perror("lstat");
+    }
+
+    if (!S_ISLNK(info.st_mode)) {
+        fprintf(stderr, "Subor %s nie je symbolic link.\n", settings->symbolicLink);
+        exit(EXIT_FAILURE);
+    }
 }
 
 //Vypisanie informacii o symbolickej linke a jej cieli (hlavna funkcionalita programu)
 void printSymbolicLinkInfo(SETTINGS * settings) {
+    struct stat info;
+
+    if (lstat(settings->symbolicLink, &info) == -1) {
+        perror("lstat");
+    }
+    
+    // alokovanie priestoru pre dlzku symlinky + 0 char
+    char* link_target = (char *) malloc((info.st_size + 1) * sizeof(char));
+
+    if (!(readlink(settings->symbolicLink, link_target, info.st_size) == -1)) {
+        link_target[info.st_size] = '\0';
+    }
+    
+    printf("Ciel symlinky: %s\n", link_target);
+    printf("Velkost symlinky: %d\n", (int) info.st_size);
 
 	//doplnte vypisanie informacie o linke
-
+    
 	//doplnte vypisanie informacii o ciele linky
-
+    free(link_target);
 }
 
 int main(int argc, char * argv[]) {
