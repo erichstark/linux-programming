@@ -17,9 +17,11 @@ void parent()
     int result;
     wait(&result);
 	
-
-    printf("%s\n", WIFEXITED(result) ? "Process exited normally." : "Process failed.");
-    printf("Return code from child: %d\n", WEXITSTATUS(result));
+    if (WIFEXITED(result)) {
+        printf("Child process exited normally.\nReturn code from child: %d\n", WEXITSTATUS(result));
+    } else {
+        printf("Child process exited with error.\n")
+    }
 
     //pockaj na ukoncenie dietata a zisti status
 	//ak bolo dieta normalne ukoncene
